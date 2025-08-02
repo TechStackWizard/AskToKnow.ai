@@ -1,0 +1,13 @@
+.chat {
+    .message {
+        padding: 15px;
+
+        &.user {
+            background-color: #242327;
+            align-self: flex-end;
+            max-width: 80%;
+            border-radius: 10px;
+        }
+    }
+
+}
