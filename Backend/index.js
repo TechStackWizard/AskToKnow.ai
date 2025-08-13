@@ -1,16 +1,31 @@
 import express from 'express';
 import ImageKit from 'imagekit';
 import cors from 'cors';
+import mongoose from 'mongoose';
 
 const app = express();
 const PORT = 3000;
 
 import dotenv from 'dotenv';
+import Chat from './model/chats.js';
+import userChat from './model/userChats.js';
 dotenv.config();
 
 app.use(cors({
     origin: process.env.CLIENT_URL
 }))
+
+app.use(express.json());
+
+const connect = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log("Connected to MongoDB successfully");
+    } catch (err) {
+        console.error("Error connecting to the database:", err);
+    }
+}
+
 
 
 var imagekit = new ImageKit({
@@ -24,8 +39,53 @@ app.get('/api/upload', (req, res) => {
     res.send({ token, expire, signature, publicKey: process.env.IMAGEKIT_PUBLIC_KEY });
 
 });
+app.post('/api/chats', async (req, res) => {
+    const { userId, text } = req.body;
+
+    try {
+        // CREATE A NEW CHAT
+        const newChat = new Chat({
+            userId: userId,
+            history: [{ role: "user", parts: [{ text }] }]
+        })
+
+        const saveChat = await newChat.save();
+
+        // CHECK IF THE USERCHAT EXISTS
+        const userChats = await Chat.find({ userId: userId });
+
+        // IF DOESN'T EXIST CREATE A NEW USERCHAT
+        if (!userChats.length) {
+            const newUserChat = new userChat({
+                userId: userId,
+                chats: [{
+                    _id: saveChat._id,
+                    title: text.substring(0, 40),
+                }]
+            });
+            await newUserChat.save();
+        }
+        // IF EXISTS, ADD THE NEW CHAT TO THE USERCHAT
+        else {
+            await userChat.updateOne(
+                { userId: userId },
+                { $push: { chats: { _id: saveChat._id, title: text.substring(0, 40) } } }
+            );
+            res.status(200).send("Chat added to user chats", newChat._id);
+        }
+    }
+    catch (err) {
+        console.error("Error processing chat message:", err);
+        return res.status(500).send("Internal Server Error while processing chat message");
+    }
+
+
+    console.log("Received chat message:", text);
+
+});
 
 app.listen(PORT, () => {
+    connect();
     console.log(`Server is running on http://localhost:${PORT}`);
 }
 )

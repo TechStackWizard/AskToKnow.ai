@@ -1,0 +1,30 @@
+.newForm {
+    width: 50%;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+
+    input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        color: #ececec;
+    }
+
+    button,
+    label {
+        border: none;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        /* width: min-content; */
+        max-width: fit-content;
+    }
+
+
+}

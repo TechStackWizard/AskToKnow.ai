@@ -1,6 +1,18 @@
 .chat {
+
+    p,
+    li {
+        margin: 10px 0;
+    }
+
+    li {
+        list-style: disc;
+        margin-left: 20px;
+    }
+
     .message {
         padding: 15px;
+
 
         &.user {
             background-color: #242327;

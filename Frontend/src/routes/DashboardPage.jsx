@@ -1,9 +1,28 @@
 import RootLayout from "../layouts/RootLayout"
 import { AiOutlineSend } from 'react-icons/ai';
 import { CgAttachment } from 'react-icons/cg';
+import { useAuth } from "@clerk/clerk-react";
 
 
 const DashboardPage = () => {
+
+  const { userId } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const text = e.target.text.value;
+    if (!text) return;
+    e.target.text.value = '';
+
+    await fetch('http://localhost:3000/api/chats', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userId, text })
+    })
+  }
+
   return (
     <div className="dashboard-page flex flex-col items-center h-full gap-8">
       <div className="texts flex flex-col justify-center items-center grow gap-8 w-1/2">
@@ -30,12 +49,12 @@ const DashboardPage = () => {
 
 
       <div className="formContainer flex  w-1/2 mt-auto ">
-        <form className="input w-full flex items-center bg-gray-600 h-16 rounded-2xl mb-3 gap-5 px-4">
+        <form className="input w-full flex items-center bg-gray-600 h-16 rounded-2xl mb-3  px-4" onSubmit={handleSubmit}>
           <div className="attach p-2 cursor-pointer">
             <CgAttachment />
           </div>
 
-          <input className=" p-4 outline-0 grow text-sm" placeholder="Ask me Something..." />
+          <input className=" p-4 outline-0 grow text-sm" name="text" placeholder="Ask me Something..." />
           <button className="send p-2 cursor-pointer ">
             <AiOutlineSend />
           </button>
