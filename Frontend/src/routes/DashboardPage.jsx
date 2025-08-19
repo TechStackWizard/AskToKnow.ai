@@ -2,25 +2,39 @@ import RootLayout from "../layouts/RootLayout"
 import { AiOutlineSend } from 'react-icons/ai';
 import { CgAttachment } from 'react-icons/cg';
 import { useAuth } from "@clerk/clerk-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 
 const DashboardPage = () => {
 
-  const { userId } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const mutation = useMutation({
+    mutationFn: (text) => {
+      return fetch(`${import.meta.env.VITE_ENDPOINT_URL}/api/chats`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      }).then((res) => res.json());
+    },
+    onSuccess: (id) => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["userChats"] });
+      navigate(`/dashboard/chats/${id}`);
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const text = e.target.text.value;
     if (!text) return;
-    e.target.text.value = '';
 
-    await fetch('http://localhost:3000/api/chats', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ userId, text })
-    })
+    mutation.mutate(text);
   }
 
   return (
@@ -47,9 +61,8 @@ const DashboardPage = () => {
         </div>
       </div>
 
-
       <div className="formContainer flex  w-1/2 mt-auto ">
-        <form className="input w-full flex items-center bg-gray-600 h-16 rounded-2xl mb-3  px-4" onSubmit={handleSubmit}>
+        <form className="input w-full flex items-center bg-gray-600 h-16 rounded-2xl mb-3 px-4" onSubmit={handleSubmit}>
           <div className="attach p-2 cursor-pointer">
             <CgAttachment />
           </div>

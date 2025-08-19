@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom"
 
 const HomePage = () => {
+
+  const test = async () => {
+    const res = await fetch('http://localhost:3000/api/test', {
+      method: 'GET',
+      credentials: 'include',
+    });
+  }
+
   return (
     <div className="flex flex-col md:flex-row items-center justify-center gap-8 grow h-full">
 
@@ -14,6 +22,7 @@ const HomePage = () => {
             Get Started
           </Link>
         </button>
+
       </div>
 
       <div className="rigth w-[80%] md:w-1/2 grow h-full flex justify-center items-center">
@@ -27,7 +36,7 @@ const HomePage = () => {
       </div>
 
       <div className="terms md:absolute bottom-0 bg-amber-300 w-full flex flex-col items-center justify-center py-2">
-        <img src="" alt="logo" />
+        <img src="/vite.svg" alt="logo" />
         <div className="links flex gap-2.5 hover:underline-offset-2 font-bold ">
           <Link className="hover:underline">Terms of Services</Link> |
           <Link className="hover:underline">Privacy Policy</Link>

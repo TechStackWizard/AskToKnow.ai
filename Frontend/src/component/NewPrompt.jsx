@@ -9,8 +9,9 @@ import './newPrompt.css';
 import models from '../lib/gemini';
 import ReactMarkdown from 'react-markdown';
 import { GoogleGenAI } from '@google/genai';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const NewPrompt = () => {
+const NewPrompt = ({ data }) => {
 
     const [answer, setAnswer] = useState("")
     const [question, setQuestion] = useState('')
@@ -52,21 +53,67 @@ const NewPrompt = () => {
         ],
         generatioinConfig: {
             safetySettings: safetySettings,
-            // maxOutputTokens: 100,
+            // maxOutputTokens: 500,
         },
     });
 
 
-    const add = async (text) => {
-        setQuestion(text)
 
-        const response = await chat.sendMessageStream({
-            message: text,
-        });
-        let accumulator = "";
-        for await (const chunk of response) {
-            accumulator += chunk.text;
-            setAnswer(accumulator);
+    useEffect(() => {
+        endRef.current.scrollIntoView({ behaviour: "smooth" })
+    }, [data, question, answer, img])
+
+
+    const queryClient = useQueryClient();
+
+
+    const mutation = useMutation({
+        mutationFn: () => {
+            return fetch(`${import.meta.env.VITE_ENDPOINT_URL}/api/chat/${data._id}`, {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ question: question.length ? question : undefined, answer, img: img.dbData?.filePath || undefined }),
+            }).then((res) => res.json());
+        },
+        onSuccess: (id) => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+                setQuestion("")
+                setAnswer("")
+                setImg({
+                    isLoading: false,
+                    error: "",
+                    dbData: {},
+                    aiData: {}
+                })
+            });
+        },
+
+        onError: (err) => {
+            console.log(err)
+        }
+    });
+
+    const add = async (text, isInitial) => {
+        if (!isInitial) setQuestion(text);
+
+        try {
+            const response = await chat.sendMessageStream({
+                message: text,
+            });
+            let accumulator = "";
+            for await (const chunk of response) {
+                accumulator += chunk.text;
+                setAnswer(accumulator);
+            }
+
+            mutation.mutate();
+        }
+        catch (err) {
+            console.log(err);
         }
     }
 
@@ -76,13 +123,19 @@ const NewPrompt = () => {
         const text = e.target.text.value;
         if (!text) return;
 
-        add(text);
+        add(text, false);
         e.target.text.value = "";
     }
 
+    const hasRun = useRef(false);
     useEffect(() => {
-        endRef.current.scrollIntoView({ behaviour: "smooth" })
-    }, [question, answer, img])
+        if (!hasRun.current) {
+            if (data?.history?.length === 1) {
+                add(data.history[0].parts[0].text, true)
+            }
+        }
+        hasRun.current = true;
+    }, [])
 
 
 
@@ -102,9 +155,8 @@ const NewPrompt = () => {
 
             {question && <div className='message user'>{question}</div>}
             {answer && <div className='message'><ReactMarkdown>{answer}</ReactMarkdown></div>}
-            <button onClick={add}>Add</button>
             <div className="endChat pb-20" ref={endRef}></div>
-            <form action="" className='newForm bg-gray-600 justify-between rounded-2xl mb-2.5 h-16' onSubmit={handleSubmit}>
+            <form action="" className='newForm bg-gray-600 justify-between rounded-2xl mb-2.5 h-16' onSubmit={handleSubmit} ref={hasRun}>
                 <label htmlFor="file" className='attach p-2 cursor-pointer flex justify-center items-center'>
                     <Upload setImg={setImg} />
                 </label>
