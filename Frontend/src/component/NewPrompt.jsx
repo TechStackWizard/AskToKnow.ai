@@ -81,6 +81,7 @@ const NewPrompt = ({ data }) => {
         onSuccess: (id) => {
             // Invalidate and refetch
             queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+                formRef.current.reset();
                 setQuestion("")
                 setAnswer("")
                 setImg({
@@ -109,7 +110,6 @@ const NewPrompt = ({ data }) => {
                 accumulator += chunk.text;
                 setAnswer(accumulator);
             }
-
             mutation.mutate();
         }
         catch (err) {
@@ -128,6 +128,8 @@ const NewPrompt = ({ data }) => {
     }
 
     const hasRun = useRef(false);
+    const formRef = useRef(null);
+
     useEffect(() => {
         if (!hasRun.current) {
             if (data?.history?.length === 1) {
@@ -156,7 +158,7 @@ const NewPrompt = ({ data }) => {
             {question && <div className='message user'>{question}</div>}
             {answer && <div className='message'><ReactMarkdown>{answer}</ReactMarkdown></div>}
             <div className="endChat pb-20" ref={endRef}></div>
-            <form action="" className='newForm bg-gray-600 justify-between rounded-2xl mb-2.5 h-16' onSubmit={handleSubmit} ref={hasRun}>
+            <form action="" className='newForm bg-gray-600 justify-between rounded-2xl mb-2.5 h-16' onSubmit={handleSubmit} ref={formRef}>
                 <label htmlFor="file" className='attach p-2 cursor-pointer flex justify-center items-center'>
                     <Upload setImg={setImg} />
                 </label>

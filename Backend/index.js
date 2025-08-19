@@ -154,7 +154,6 @@ app.put('/api/chat/:id', legacyRequireAuth, async (req, res) => {
                 }
             }
         })
-
         const chat = await Chat.findOne({ _id: req.params.id, userId });
         return res.status(200).json(chat);
     }
