@@ -63,9 +63,9 @@ const DashboardPage = () => {
 
       <div className="formContainer flex  w-1/2 mt-auto ">
         <form className="input w-full flex items-center bg-gray-600 h-16 rounded-2xl mb-3 px-4" onSubmit={handleSubmit}>
-          <div className="attach p-2 cursor-pointer">
+          {/* <div className="attach p-2 cursor-pointer">
             <CgAttachment />
-          </div>
+          </div> */}
 
           <input className=" p-4 outline-0 grow text-sm" name="text" placeholder="Ask me Something..." />
           <button className="send p-2 cursor-pointer ">

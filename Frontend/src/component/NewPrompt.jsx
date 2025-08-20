@@ -15,10 +15,6 @@ const NewPrompt = ({ data }) => {
 
     const [answer, setAnswer] = useState("")
     const [question, setQuestion] = useState('')
-
-    const endRef = useRef(null);
-
-
     const [img, setImg] = useState({
         isLoading: false,
         error: "",
@@ -26,6 +22,7 @@ const NewPrompt = ({ data }) => {
         aiData: {}
 
     });
+
     const ai = new GoogleGenAI({ apiKey: `${import.meta.env.VITE_GEMINI_API_KEY}` });
 
     const safetySettings = [
@@ -38,26 +35,23 @@ const NewPrompt = ({ data }) => {
             threshold: "BLOCK_LOW_AND_ABOVE",
         },
     ];
+    // console.log(data)
 
     const chat = ai.chats.create({
         model: "gemini-2.5-flash",
-        history: [
-            {
-                role: "user",
-                parts: [{ text: "Hello" }],
-            },
-            {
-                role: "model",
-                parts: [{ text: "Great to meet you. What would you like to know?" }],
-            },
-        ],
-        generatioinConfig: {
-            safetySettings: safetySettings,
-            // maxOutputTokens: 500,
+        history: data?.history.map(({ role, parts }) => ({
+            role,
+            parts: [{ text: parts[0].text }]
+        })
+        ),
+        generationConfig: {
+            safetySettings,
+            maxOutputTokens: 500,
         },
     });
 
-
+    const endRef = useRef(null);
+    const formRef = useRef(null);
 
     useEffect(() => {
         endRef.current.scrollIntoView({ behaviour: "smooth" })
@@ -65,7 +59,6 @@ const NewPrompt = ({ data }) => {
 
 
     const queryClient = useQueryClient();
-
 
     const mutation = useMutation({
         mutationFn: () => {
@@ -83,7 +76,7 @@ const NewPrompt = ({ data }) => {
             queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
                 formRef.current.reset();
                 setQuestion("")
-                setAnswer("")
+                // setAnswer("")
                 setImg({
                     isLoading: false,
                     error: "",
@@ -107,6 +100,7 @@ const NewPrompt = ({ data }) => {
             });
             let accumulator = "";
             for await (const chunk of response) {
+                console.log(chunk.text)
                 accumulator += chunk.text;
                 setAnswer(accumulator);
             }
@@ -122,17 +116,16 @@ const NewPrompt = ({ data }) => {
 
         const text = e.target.text.value;
         if (!text) return;
-
+        // console.log("Add func called")
         add(text, false);
-        e.target.text.value = "";
     }
 
     const hasRun = useRef(false);
-    const formRef = useRef(null);
 
     useEffect(() => {
         if (!hasRun.current) {
             if (data?.history?.length === 1) {
+                // console.log("Add func called")
                 add(data.history[0].parts[0].text, true)
             }
         }

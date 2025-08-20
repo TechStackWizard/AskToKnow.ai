@@ -105,7 +105,7 @@ app.post('/api/chats', legacyRequireAuth, async (req, res) => {
     }
 
 
-    console.log("Received chat message:", text);
+    // console.log("Received chat message:", text);
 
 });
 
