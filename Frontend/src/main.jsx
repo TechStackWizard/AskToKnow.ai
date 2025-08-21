@@ -4,12 +4,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css'
 import HomePage from './routes/HomePage.jsx';
 
-import SignInPage from './routes/Signinpage.jsx';
-import SignUpPage from './routes/Signuppage.jsx';
+import SignInPage from './routes/SignInPage.jsx';
+import SignUpPage from './routes/SignUpPage.jsx';
 import ChatPage from './routes/ChatPage.jsx';
 import RootLayout from './layouts/RootLayout.jsx';
 import DashboardPage from './routes/DashboardPage.jsx';
-import DashboardLayout from './layouts/Dashboardlayout.jsx';
+import DashboardLayout from './layouts/DashboardLayout.jsx';
 
 
 
