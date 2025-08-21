@@ -2,13 +2,6 @@ import { Link } from "react-router-dom"
 
 const HomePage = () => {
 
-  const test = async () => {
-    const res = await fetch('http://localhost:3000/api/test', {
-      method: 'GET',
-      credentials: 'include',
-    });
-  }
-
   return (
     <div className="flex flex-col md:flex-row items-center justify-center gap-8 grow h-full">
 
@@ -32,7 +25,6 @@ const HomePage = () => {
           </div>
           <img src="/bot.png" alt="" className="bot w-full h-full object-contain " />
         </div>
-
       </div>
 
       <div className="terms md:absolute bottom-0 bg-amber-300 w-full flex flex-col items-center justify-center py-2">

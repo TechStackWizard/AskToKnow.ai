@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css'
-import Homepage from './routes/Homepage.jsx';
+import HomePage from './routes/HomePage.jsx';
 
 import SignInPage from './routes/Signinpage.jsx';
 import SignUpPage from './routes/Signuppage.jsx';
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/',
-        element: <Homepage />
+        element: <HomePage />
       },
       {
         element: <DashboardLayout />,

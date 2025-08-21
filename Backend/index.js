@@ -8,7 +8,7 @@ import UserChats from './model/userChats.js';
 import { clerkMiddleware, requireAuth } from '@clerk/express'
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 dotenv.config();
 
